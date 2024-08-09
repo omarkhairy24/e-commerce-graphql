@@ -31,12 +31,6 @@ import { Dialect } from 'sequelize';
         res
       })
     }),
-    // SequelizeModule.forRoot({
-    //   dialect:'sqlite',
-    //   storage:'db.sqlite',
-    //   synchronize:true,
-    //   autoLoadModels:true
-    // }),
     SequelizeModule.forRootAsync({
       inject:[ConfigService],
       useFactory:(config:ConfigService)=>{

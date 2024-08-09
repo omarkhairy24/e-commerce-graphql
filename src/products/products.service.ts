@@ -131,10 +131,6 @@ export class ProductService{
         return this.repo.findAll({where:{categoryId:catId}});
     }
 
-    findLocalized(id:string){
-        return this.LRepo.findByPk(id)
-    }
-
     getLocalized(productIds:string[]){
         return this.LRepo.findAll({where:{productId:productIds}})
     }
@@ -176,11 +172,6 @@ export class ProductService{
         });
 
         return product
-    }
-
-    async findByDefLang(){
-        const lang = await this.langService.findDefault();
-        return await this.LRepo.findAll({where:{lang}})
     }
 
 }
