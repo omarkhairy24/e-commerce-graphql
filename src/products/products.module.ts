@@ -8,18 +8,17 @@ import { CategoriesModule } from 'src/categories/categories.module';
 import { SubCategoriesModule } from 'src/sub-categories/sub-categories.module';
 import { LoaderModule } from 'src/loader/loader.module';
 import { LocalizedProducts } from './localized.products.entity';
-import { LocaziedResolver } from './localized.resolver';
 import { SystemLangsModule } from 'src/system-langs/system-langs.module';
 
 @Module({
     imports:[
         SequelizeModule.forFeature([Products,LocalizedProducts]),
         CategoriesModule,
-        forwardRef(()=>SubCategoriesModule),
+        SubCategoriesModule,
         LoaderModule,
         SystemLangsModule
     ],
-    providers:[ProductResolver,LocaziedResolver,ProductService,UploadService],
+    providers:[ProductResolver,ProductService,UploadService],
     exports:[ProductService]
 })
 export class ProductsModule {}

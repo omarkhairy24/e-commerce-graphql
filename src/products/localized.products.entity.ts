@@ -13,26 +13,25 @@ export class LocalizedProducts extends Model{
     @Field()
     id:string;
 
-    @Column
-    @Field({nullable:false})
+    @Column({allowNull:false})
+    @Field()
     lang:lng
 
-    @Column
+    @Column({allowNull:false})
     @Index
-    @Field({nullable:true})
+    @Field()
     title:string;
 
-    @Column
-    @Field({nullable:true})
+    @Column({allowNull:false})
+    @Field()
     description:string;
 
-    @Column
-    @Field({nullable:true})
+    @Column({allowNull:false})
+    @Field()
     specification:string;
 
     @ForeignKey(()=> Products)
-    @Column({ allowNull: true, type: DataType.BIGINT })
-    @Index
+    @Column({ allowNull: false, type: DataType.BIGINT })
     @Field({nullable:false})
     productId:string;
 

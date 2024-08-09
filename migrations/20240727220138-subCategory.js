@@ -32,7 +32,6 @@ module.exports = {
     });
 
     await queryInterface.addIndex('SubCategories', ['name']);
-    await queryInterface.addIndex('SubCategories', ['categoryId']);
   },
 
   async down (queryInterface, Sequelize) {

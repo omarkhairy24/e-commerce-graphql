@@ -31,6 +31,12 @@ import { Dialect } from 'sequelize';
         res
       })
     }),
+    // SequelizeModule.forRoot({
+    //   dialect:'sqlite',
+    //   storage:'db.sqlite',
+    //   synchronize:true,
+    //   autoLoadModels:true
+    // }),
     SequelizeModule.forRootAsync({
       inject:[ConfigService],
       useFactory:(config:ConfigService)=>{
@@ -48,11 +54,11 @@ import { Dialect } from 'sequelize';
       }
     }),
     UserModule,
-    MailModule,
     ProductsModule,
+    LoaderModule,
     CategoriesModule,
     SubCategoriesModule,
-    LoaderModule,
+    MailModule,
     SystemLangsModule
   ],
   controllers: [AppController],

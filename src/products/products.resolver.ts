@@ -19,6 +19,8 @@ import { SubCategories } from "src/sub-categories/subCategory.entity";
 import { LocalizedProducts } from "./localized.products.entity";
 import { lng } from "src/system-langs/sys.lang.entity";
 import { Lang } from "src/system-langs/decorators/language.decorator";
+import { CreateProductInput, LocalizedInput } from "./dtos/create.dto";
+import { UpdateLocalizationInput, UpdateProductInput } from "./dtos/update.dto";
 
 @Resolver(()=>Products)
 export class ProductResolver {
@@ -32,6 +34,21 @@ export class ProductResolver {
     async getProducts(){
         return this.productService.findAll()
     }
+    
+    @Query(()=>[Products])
+    async getProductsByLang(
+        @Lang() lang:lng
+    ){
+        return this.productService.findByLang(lang);
+    }
+
+    @Query(()=>Products)
+    async getProductByLang(
+        @Args('id') id:string,
+        @Lang() lang:lng
+    ){
+        return this.productService.findOneByLang(id,lang);
+    }
 
     @Query(()=>Products)
     async getProduct(
@@ -40,12 +57,6 @@ export class ProductResolver {
         return this.productService.findOneById(id)
     }
 
-    @Query(()=>[Products])
-    async getAlldByLang(
-        @Lang() lang:lng
-    ){
-        return this.productService.findByLang(lang)
-    }
 
     @ResolveField('category',()=>[Categories])
     async category(@Parent() products:Products){
@@ -68,48 +79,43 @@ export class ProductResolver {
         return this.loaderService.subLoader.load(products.subCategoryId)
     }
 
-    @Mutation(()=>Products)
     @UseGuards(JwtAuthGuard,isVerifiedGuard,RolesGuard)
     @IsVerified(true)
     @ROLE(Role.Admin)
+    @Mutation(()=>Products)
     async addProduct(
-        @Args('lang') lang:lng,
-        @Args('title') title:string,
-        @Args('description') description:string,
-        @Args('specification') specification:string,
-        @Args('price') price:number,
-        @Args('quantity') quantity:number,
-        @Args({name:'files' , type:() =>[GraphQLUpload]}) files:FileUpload[],
-        @Args('categoryId',{nullable:true}) categoryId:string,
-        @Args('subCategoryId',{nullable:true}) subCategoryId:string,
-    ){  
-        const imageUrl = await this.uploadService.uploadImages(files)
-        return this.productService.create(lang,title,description,specification,price,quantity,imageUrl,categoryId,subCategoryId);
+        @Args('productInput') productInput:CreateProductInput,
+        @Args('localizedInput') localizedInput:LocalizedInput,
+        @Args({name:'files' , type:() =>[GraphQLUpload],nullable:true}) files:FileUpload[]
+    ){
+        const imageUrl = await this.uploadService.uploadImages(files);
+        productInput.images = imageUrl;
+        const products = await this.productService.create(productInput,localizedInput)
+        return products
+        
     }
 
-    @Mutation(()=>Products)
     @UseGuards(JwtAuthGuard,isVerifiedGuard,RolesGuard)
     @IsVerified(true)
     @ROLE(Role.Admin)
+    @Mutation(()=>Products)
     async editProduct(
-        @Args('id') id:string,
-        @Args('lang') lang:lng,
-        @Args('title',{nullable:true}) title:string,
-        @Args('description',{nullable:true}) description:string,
-        @Args('specification',{nullable:true}) specification:string,
-        @Args('price',{nullable:true}) price:number,
-        @Args('quantity',{nullable:true}) quantity:number,
-        @Args({name:'oldImages',type:()=> [String] ,nullable:true}) oldImages:string[],
-        @Args({name:'files' , type:() =>[GraphQLUpload],nullable:true}) files:FileUpload[],
+        @Args('productId') prdouctId:string,
+        @Args('localizedId',{nullable:true}) localizedId:string,
+        @Args('productInput',{nullable:true}) productInput:UpdateProductInput,
+        @Args('localizedInput',{nullable:true}) localizedInput:UpdateLocalizationInput,
+        @Args({name:'oldImages',type:()=>[String],nullable:true}) oldImages:string[],
+        @Args({name:'files' , type:() =>[GraphQLUpload],nullable:true}) files:FileUpload[]
     ){
-        const product = await this.productService.findOneById(id)
+        const product = await this.productService.findOneById(prdouctId)
         if(!product) throw new NotFoundException();
 
         let allImages = []
+
         if(!oldImages && product.images.length > 0){
             product.images.forEach(image =>{
                 fs.unlinkSync(join(`uploads/${image}`))
-            })   
+            })
         }
         if(Array.isArray(oldImages)){ allImages.push(...oldImages) } else { allImages.push(oldImages) };
         if(files){
@@ -117,18 +123,8 @@ export class ProductResolver {
             allImages.push(...imageUrls)
         }
 
-        product.set({
-            lang,
-            title,
-            description,
-            specification,
-            price,
-            quantity,
-            images:allImages
-        })
-
-        await product.save()
-        return product
+        productInput.images = allImages;
+        return await this.productService.updateProduct(prdouctId,localizedId,productInput,localizedInput);
     }
 
     @Mutation(()=>Boolean)

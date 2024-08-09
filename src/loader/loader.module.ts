@@ -6,9 +6,9 @@ import { LoaderService } from './loader.service';
 
 @Module({
     imports:[
-        forwardRef(()=>ProductsModule),
-        forwardRef(()=>CategoriesModule),
-        forwardRef(()=>SubCategoriesModule)
+        forwardRef(() => CategoriesModule),
+		SubCategoriesModule,
+		forwardRef(() => ProductsModule),
     ],
     providers:[LoaderService],
     exports:[LoaderService]

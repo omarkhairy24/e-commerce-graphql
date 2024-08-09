@@ -10,9 +10,8 @@ import { LoaderModule } from 'src/loader/loader.module';
 @Module({
     imports:[
         SequelizeModule.forFeature([Categories]),
-        forwardRef(()=>ProductsModule),
-        forwardRef(()=>SubCategoriesModule),
-        forwardRef(()=>LoaderModule)
+        forwardRef(() => ProductsModule),
+		LoaderModule,
     ],
     providers:[CategoryService,CategoryResolver],
     exports:[CategoryService]

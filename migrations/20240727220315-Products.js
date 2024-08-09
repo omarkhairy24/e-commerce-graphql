@@ -8,22 +8,6 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      lang: {
-        type: Sequelize.ENUM('ar', 'en', 'fr'),
-        allowNull: true,
-      },
-      title: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      description: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      specification: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       price: {
         type: Sequelize.FLOAT,
         allowNull: true,
@@ -63,9 +47,6 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
-
-    await queryInterface.addIndex('Products', ['title']);
-    await queryInterface.addIndex('Products', ['price']);
   },
 
   async down (queryInterface, Sequelize) {
